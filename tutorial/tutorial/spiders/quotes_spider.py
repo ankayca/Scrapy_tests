@@ -17,7 +17,7 @@ class QuotesSpider(scrapy.Spider):
         #page = response.url.split("/")[-2]
         self.counter = 0
         for t in range(0,len(response.css(".text::text").getall())):
-            print("hello boyyy*******************" + str(self.counter))
+            print("hello boyyy******************" + str(self.counter))
             self.counter = self.counter +1
             print(response.css(".text::text")[t].get())
             # filename = f'quotes-{t}.html'
