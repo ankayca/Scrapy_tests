@@ -1,1 +1,2 @@
-awetwAERW
+git commit -m "yapılan değişiklik"
+
