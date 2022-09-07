@@ -16,12 +16,15 @@ class QuotesSpider(scrapy.Spider):
     def parse(self, response):
         #page = response.url.split("/")[-2]
         self.counter = 0
-        for t in range(0,len(response.css(".text::text").getall())):
+        for t in response.css(".quote"):
             print("hello boyyy******************" + str(self.counter))
             self.counter = self.counter +1
-            print(response.css(".text::text")[t].get())
-            # filename = f'quotes-{t}.html'
-            # with open(filename, 'wb') as f:
-            #     f.write(response.body)
-            # self.log(f'Saved file {filename}')
+            yield {
+                'text':t.css(".text::text").get(),
+                'author':t.css(".author::text").get(),
+                'tags':t.css(".tag::text").getall()}
+        next_page = response.css('.next a::attr(href)').get()
+        if next_page is not None:
+            yield response.follow(next_page,callback=self.parse)
+        print("------------------" + next_page)
             
