@@ -1,4 +1,4 @@
-from ctypes import sizeof
+
 import scrapy
 
 
@@ -20,11 +20,10 @@ class QuotesSpider(scrapy.Spider):
             print("hello boyyy******************" + str(self.counter))
             self.counter = self.counter +1
             yield {
-                'text':t.css(".text::text").get(),
-                'author':t.css(".author::text").get(),
+                'text':t.css(".text::text").get().replace('"' ,''),
+                'author':t.css(".author::text").get().replace('"' ,''),
                 'tags':t.css(".tag::text").getall()}
         next_page = response.css('.next a::attr(href)').get()
         if next_page is not None:
             yield response.follow(next_page,callback=self.parse)
         print("------------------" + next_page)
-            
