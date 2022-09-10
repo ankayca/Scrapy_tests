@@ -10,8 +10,8 @@ basedir = os.path.dirname(os.path.realpath('__file__'))
 
 class DribbbleSpider(scrapy.Spider):
     name = "amazon"
-    allowed_domains = ["www.amazon.com.tr"]
-    start_urls = ['https://www.amazon.com.tr/s?bbn=13709880031&rh=n%3A12466496031%2Cn%3A13709880031%2Cn%3A13709907031&dc&qid=1662712507&rnid=13709880031&ref=lp_13709880031_nr_n_4']
+    allowed_domains = ["amazon.com.tr"]
+    start_urls = ['https://www.amazon.com.tr/s?i=electronics&bbn=13709907031&rh=n%3A12466496031%2Cn%3A13709880031%2Cn%3A13709907031%2Cp_n_feature_sixteen_browse-bin%3A13710916031&dc&fs=true&ds=v1%3A8r1nG18W3gHXEyln4hz8vLecS6SLzgVuZit79SbnFlI&qid=1662791208&rnid=13710915031&ref=sr_nr_p_n_feature_sixteen_browse-bin_1']
 
 
     def parse(self, response):
@@ -22,32 +22,41 @@ class DribbbleSpider(scrapy.Spider):
         # instantiate a chrome options object so you can set the size and headless preference
         chrome_options = Options()
         chrome_options.add_argument("--window-size=1920x1080")
-
+        chrome_options.add_argument("--incognito")
         # comment out the following line if you don't want to actually show Chrome instance
         # but you can still see that the crawling is working via output in console
 
-        # chrome_options.add_argument("--headless")
+        #chrome_options.add_argument("--headless")
 
 
         # comment out the following two lines to setup ProxyMesh service
         # make sure you add the IP of the machine running this script to you ProxyMesh account for IP authentication
         # IP:PORT or HOST:PORT you get this in your account once you pay for a plan
 
-        PROXY = "us-wa.proxymesh.com:31280"
-        chrome_options.add_argument('--proxy-server=%s' % PROXY)
+        # PROXY = "us-wa.proxymesh.com:31280"
+        # chrome_options.add_argument('--proxy-server=%s' % PROXY)
 
         chrome_driver_path = os.path.join(basedir, 'chromedriver')
         driver = webdriver.Chrome(chrome_options=chrome_options, executable_path=chrome_driver_path)
 
-        driver.get('https://www.amazon.com.tr/s?i=electronics&rh=n%3A13709907031&fs=true&page=2&qid=1662714303&ref=sr_pg_2')
+        driver.get('https://www.amazon.com.tr/s?i=electronics&bbn=13709907031&rh=n%3A12466496031%2Cn%3A13709880031%2Cn%3A13709907031%2Cp_n_feature_sixteen_browse-bin%3A13710916031&dc&fs=true&ds=v1%3A8r1nG18W3gHXEyln4hz8vLecS6SLzgVuZit79SbnFlI&qid=1662791208&rnid=13710915031&ref=sr_nr_p_n_feature_sixteen_browse-bin_1')
         scrapy_selector = Selector(text = driver.page_source)
 
         self.logger.info("*********** before scrolling ************")
-        self.logger.info(scrapy_selector.css('.a-text-normal span').getall())
-        for datas in scrapy_selector.css('.a-text-normal'):
-            self.logger.info(datas.css(".a-text-normal span::text").getall())
-            self.logger.info(datas.css('.a-size-base-plus::text').get())
-            self.logger.info("*********** selammmm ************")
+        self.logger.info(scrapy_selector.css('.s-card-border').getall())
+        for datas in scrapy_selector.css('.s-card-border'):
+            yield{
+                "name":datas.css(".a-color-base.a-text-normal::text").get(),
+                "price":datas.css('.a-price-whole::text').get(),
+                "url":datas.css(".a-text-normal  ::attr(href)").get()
+            }
+        
+        
+            # self.logger.info(datas.css(".a-color-base.a-text-normal::text").getall())
+            # print("FIYATTT")
+            # self.logger.info(datas.css('.a-price-whole::text').get())
+            # self.logger.info(datas.css(".a-text-normal  ::attr(href)").get())
+            # self.logger.info("*********** selammmm ************")
             
         # self.logger.info(len(scrapy_selector.css('.vcard a[data-subject]::text').getall()))
 
@@ -84,7 +93,7 @@ class DribbbleSpider(scrapy.Spider):
         # sleep(1)
         # search_button = driver.find_element_by_css_selector('input[type="submit"]')
         # search_button.click()
-        sleep(5)
+        sleep(30)
         driver.quit()
 #149.28.10.207
 

@@ -1,6 +1,7 @@
 
 import scrapy
-
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 class QuotesSpider(scrapy.Spider):
     name = "quotes"
